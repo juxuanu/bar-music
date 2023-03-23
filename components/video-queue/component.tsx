@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 type VideoId = string;
 
 interface Props {
@@ -9,7 +7,10 @@ interface Props {
 
 export default function VideoQueue(props: Props): JSX.Element {
   return (
-    <>
+    <div>
+      <h2 className="border-b border-gray-300 border-solid text-lg mb-4">
+        Cua
+      </h2>
       <ol className="list-decimal list-inside">
         {props.videosInQueue
           .filter((v) => v)
@@ -23,6 +24,6 @@ export default function VideoQueue(props: Props): JSX.Element {
             </li>
           ))}
       </ol>
-    </>
+    </div>
   );
 }
