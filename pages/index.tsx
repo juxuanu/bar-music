@@ -19,6 +19,10 @@ export default function Home() {
     setCurrentVideoId(nextVideo);
   };
 
+  const addVideoToQueue = (videoId: VideoId) => {
+    setVideosInQueue(videosInQueue.concat(videoId));
+  };
+
   useEffect(() => {
     localStorage.setItem(
       localStorageVideosInQueueKey,
@@ -45,7 +49,7 @@ export default function Home() {
         <title>Música</title>
       </Head>
       <div className="absolute right-1/2 top-20 translate-x-1/2 w-96">
-        <SearchOverlay />
+        <SearchOverlay onVideoClicked={addVideoToQueue} />
       </div>
       <div className="mx-auto mt-40 px-12 max-w-[1600px] flex flex-col sm:flex-row gap-10 justify-between">
         <Player videoId={currentVideoId} onVideoEnd={playNextVideo} />
