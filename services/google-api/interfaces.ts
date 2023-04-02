@@ -12,7 +12,7 @@ interface PageInfo {
   resultsPerPage: number;
 }
 
-interface Item {
+export interface Item {
   kind: string;
   etag: string;
   id: Id;

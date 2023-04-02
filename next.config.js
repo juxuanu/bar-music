@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    runtime: process.env.NODE_ENV === "production" ? "edge" : undefined,
+  },
   images: {
     remotePatterns: [
       {

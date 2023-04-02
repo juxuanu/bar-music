@@ -3,61 +3,82 @@ import Player from "@/components/player";
 import VideoQueue from "@/components/video-queue";
 import { useEffect, useState } from "react";
 import SearchOverlay from "@/components/search-overlay";
-
-type VideoId = string;
+import useResize from "@/hooks/use-resize";
+import { Video } from "@/services/google-api";
 
 const localStorageVideosInQueueKey = "videosInQueue";
 
 export default function Home() {
-  const [videosInQueue, setVideosInQueue] = useState<Array<string>>([]);
-  const [currentVideoId, setCurrentVideoId] = useState<VideoId>("");
+  const [videosInQueue, setVideosInQueue] = useState<Array<Video>>([]);
+  const [currentVideo, setCurrentVideo] = useState<Video>();
+  const [width, setWidth] = useState(0);
+  const size = useResize();
 
-  const playNextVideo = () => {
-    const nextVideo = videosInQueue[0] ?? "";
-    console.debug(nextVideo);
-    setVideosInQueue(videosInQueue.length > 0 ? videosInQueue.slice(1) : []);
-    setCurrentVideoId(nextVideo);
+  const playNextVideo = (queue: Video[]) => {
+    if (queue.length <= 0) return;
+    const nextVideo = queue[0];
+    setVideosInQueue(queue.length > 0 ? queue.slice(1) : []);
+    setCurrentVideo(nextVideo);
   };
 
-  const addVideoToQueue = (videoId: VideoId) => {
-    setVideosInQueue(videosInQueue.concat(videoId));
-  };
+  const addVideoToQueue = (video: Video) =>
+    setVideosInQueue([...videosInQueue, video]);
 
-  useEffect(() => {
-    localStorage.setItem(
-      localStorageVideosInQueueKey,
-      JSON.stringify(videosInQueue)
-    );
-  });
+  const removeVideoFromQueue = (index: number) =>
+    setVideosInQueue([
+      ...videosInQueue.slice(0, index),
+      ...videosInQueue.slice(index + 1),
+    ]);
+
+  useEffect(() => setWidth(size.width), [size.width]);
 
   useEffect(() => {
     const videosInQueueLocalStorage = JSON.parse(
-      localStorage.getItem(localStorageVideosInQueueKey) ?? ""
-    ) as Array<string>;
-    if (videosInQueueLocalStorage && videosInQueueLocalStorage.length > 0) {
-      setVideosInQueue(videosInQueueLocalStorage.slice(1));
-      setCurrentVideoId(videosInQueueLocalStorage[0]);
-    } else {
-      setVideosInQueue(["ORMx45xqWkA"]);
-      setCurrentVideoId("dQw4w9WgXcQ");
+      localStorage.getItem(localStorageVideosInQueueKey) ?? "[]"
+    ) as Array<Video>;
+    if (
+      videosInQueueLocalStorage &&
+      Array.isArray(videosInQueueLocalStorage) &&
+      videosInQueueLocalStorage.length > 0
+    ) {
+      setCurrentVideo(videosInQueueLocalStorage[0]);
+      setVideosInQueue([...videosInQueueLocalStorage.slice(1)]);
     }
   }, []);
+
+  useEffect(() => {
+    if (videosInQueue.length === 1 && !currentVideo)
+      playNextVideo(videosInQueue);
+  }, [currentVideo, videosInQueue, videosInQueue.length]);
 
   return (
     <>
       <Head>
         <title>Música</title>
       </Head>
-      <div className="absolute right-1/2 top-20 translate-x-1/2 w-96">
-        <SearchOverlay onVideoClicked={addVideoToQueue} />
-      </div>
-      <div className="mx-auto mt-40 px-12 max-w-[1600px] flex flex-col sm:flex-row gap-10 justify-between">
-        <Player videoId={currentVideoId} onVideoEnd={playNextVideo} />
-        <VideoQueue
-          onVideoClicked={setCurrentVideoId}
-          videosInQueue={videosInQueue}
+      <div className="mx-auto mt-40 xl:px-2 px-12 max-w-[1600px] flex flex-col xl:flex-row gap-10 justify-between">
+        <Player
+          video={currentVideo}
+          onVideoEnd={() => playNextVideo(videosInQueue)}
+          width={buildPlayerAndQueueWidth(width)}
+          showNextButton={videosInQueue.length > 0}
         />
+        <div className="flex flex-col">
+          <SearchOverlay
+            onVideoClicked={(video: Video) => addVideoToQueue(video)}
+          />
+          <VideoQueue
+            onVideoClicked={(video: Video) => setCurrentVideo(video)}
+            onVideoRemoved={(index: number) => removeVideoFromQueue(index)}
+            videosInQueue={videosInQueue}
+          />
+        </div>
       </div>
     </>
   );
+}
+
+function buildPlayerAndQueueWidth(width: number): number {
+  if (width <= 1280) return width;
+  return width / 2;
 }
