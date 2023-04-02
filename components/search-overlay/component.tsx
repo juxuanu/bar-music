@@ -97,7 +97,7 @@ export default function SearchOverlay(props: Props): JSX.Element {
                     className="px-2 rounded flex flex-row justify-between cursor-pointer hover:bg-blue-200"
                     key={item.id.videoId}
                   >
-                    <VideoCard video={item} button={addToQueueIcon} />
+                    <VideoCard video={item} />
                   </li>
                 ))}
               </ul>

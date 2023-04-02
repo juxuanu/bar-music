@@ -2,7 +2,7 @@ import { Video } from "@/services/google-api";
 
 interface Props {
   video: Video;
-  className: string;
+  className?: string;
 }
 
 export default function VideoCard(props: Props) {
