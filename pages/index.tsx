@@ -15,7 +15,10 @@ export default function Home() {
   const [currentVideo, setCurrentVideo] = useState<Video>();
 
   const playNextVideo = (queue: Video[]) => {
-    if (queue.length <= 0) return;
+    if (queue.length <= 0) {
+      setCurrentVideo(undefined);
+      return;
+    }
     const nextVideo = queue[0];
     setVideosInQueue(queue.length > 0 ? queue.slice(1) : []);
     setCurrentVideo(nextVideo);
