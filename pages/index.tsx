@@ -1,18 +1,18 @@
 import Head from "next/head";
 import Player from "@/components/player";
 import VideoQueue from "@/components/video-queue";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchOverlay from "@/components/search-overlay";
-import useResize from "@/hooks/use-resize";
 import { Video } from "@/services/google-api";
 
-const localStorageVideosInQueueKey = "videosInQueue";
+const localStorageKeys = {
+  videosInQueue: "videosInQueue",
+  currentVideo: "currentVideo",
+};
 
 export default function Home() {
   const [videosInQueue, setVideosInQueue] = useState<Array<Video>>([]);
   const [currentVideo, setCurrentVideo] = useState<Video>();
-  const [width, setWidth] = useState(0);
-  const size = useResize();
 
   const playNextVideo = (queue: Video[]) => {
     if (queue.length <= 0) return;
@@ -30,26 +30,73 @@ export default function Home() {
       ...videosInQueue.slice(index + 1),
     ]);
 
-  useEffect(() => setWidth(size.width), [size.width]);
+  const onVideoDown = useCallback(
+    (oldIndex: number) => {
+      if (oldIndex >= videosInQueue.length - 1) return;
+      setVideosInQueue((prevState) => [
+        ...prevState.slice(0, oldIndex),
+        prevState[oldIndex + 1],
+        prevState[oldIndex],
+        ...prevState.slice(oldIndex + 2),
+      ]);
+    },
+    [videosInQueue.length]
+  );
+
+  const onVideoUp = useCallback((oldIndex: number) => {
+    if (oldIndex === 0) return;
+    setVideosInQueue((prevState) => [
+      ...prevState.slice(0, oldIndex - 1),
+      prevState[oldIndex],
+      prevState[oldIndex - 1],
+      ...prevState.slice(oldIndex + 1),
+    ]);
+  }, []);
 
   useEffect(() => {
-    const videosInQueueLocalStorage = JSON.parse(
-      localStorage.getItem(localStorageVideosInQueueKey) ?? "[]"
-    ) as Array<Video>;
+    let videosInQueueLocalStorage;
+    let currentVideoLocalStorage;
+
+    try {
+      videosInQueueLocalStorage = JSON.parse(
+        localStorage.getItem(localStorageKeys["videosInQueue"]) ?? "[]"
+      ) as Array<Video>;
+    } catch (e) {
+      console.log("No queued videos in local storage");
+    }
+    try {
+      currentVideoLocalStorage = JSON.parse(
+        localStorage.getItem(localStorageKeys["currentVideo"]) ?? "{}"
+      ) as Video;
+    } catch (e) {
+      console.log("No current video in local storage");
+    }
+
     if (
       videosInQueueLocalStorage &&
       Array.isArray(videosInQueueLocalStorage) &&
       videosInQueueLocalStorage.length > 0
-    ) {
-      setCurrentVideo(videosInQueueLocalStorage[0]);
-      setVideosInQueue([...videosInQueueLocalStorage.slice(1)]);
-    }
+    )
+      setVideosInQueue([...videosInQueueLocalStorage]);
+
+    if (currentVideoLocalStorage) setCurrentVideo(currentVideoLocalStorage);
   }, []);
 
   useEffect(() => {
     if (videosInQueue.length === 1 && !currentVideo)
       playNextVideo(videosInQueue);
   }, [currentVideo, videosInQueue, videosInQueue.length]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      localStorageKeys["videosInQueue"],
+      JSON.stringify(videosInQueue)
+    );
+    localStorage.setItem(
+      localStorageKeys["currentVideo"],
+      JSON.stringify(currentVideo)
+    );
+  }, [currentVideo, videosInQueue]);
 
   return (
     <>
@@ -60,27 +107,21 @@ export default function Home() {
         <Player
           video={currentVideo}
           onVideoEnd={() => playNextVideo(videosInQueue)}
-          width={buildPlayerAndQueueWidth(width)}
           showNextButton={videosInQueue.length > 0}
         />
         <div className="flex flex-col">
-          <SearchOverlay
-            onVideoClicked={(video: Video) => addVideoToQueue(video)}
-          />
+          <SearchOverlay onVideoClicked={addVideoToQueue} />
           <VideoQueue
-            onVideoClicked={(video: Video) => setCurrentVideo(video)}
-            onVideoRemoved={(index: number) => removeVideoFromQueue(index)}
+            onVideoDown={onVideoDown}
+            onVideoUp={onVideoUp}
+            onVideoClicked={setCurrentVideo}
+            onVideoRemoved={removeVideoFromQueue}
             videosInQueue={videosInQueue}
           />
         </div>
       </div>
     </>
   );
-}
-
-function buildPlayerAndQueueWidth(width: number): number {
-  if (width <= 1280) return width;
-  return width / 2;
 }
 
 function buildPageTitle(songTitle?: string): string {

@@ -12,7 +12,6 @@ interface Props {
   video?: Video | null;
   onVideoEnd: () => void;
   showNextButton?: boolean;
-  width: number;
 }
 
 let videoElement: YouTubePlayer | null = null;
@@ -21,7 +20,6 @@ export default function Player(props: Props): JSX.Element {
   const [video, setVideo] = useState(props.video);
   const [playerLoading, setPlayerLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [width, setWidth] = useState(props.width);
   const youtubeElement = useRef<YouTube>(null);
 
   useEffect(() => setVideo(props.video), [props.video]);
@@ -30,21 +28,23 @@ export default function Player(props: Props): JSX.Element {
       setIsPlaying(videoElement && videoElement.target.getPlayerState() === 1),
     []
   );
-  useEffect(() => setWidth(props.width), [props.width]);
 
   return (
-    <div className="relative" style={{ width: props.width }}>
+    <div className="relative">
       {playerLoading && video && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Spinner />
         </div>
       )}
       {video ? (
-        <div className="h-hit w-fit mx-auto">
-          <div className="text-lg p-1">{video.snippet.title}</div>
+        <div className="h-hit w-full mx-auto">
+          <div
+            className="text-lg p-1"
+            dangerouslySetInnerHTML={{ __html: video.snippet.title }}
+          ></div>
           <YouTube
             videoId={video.id.videoId}
-            className="-z-10 mx-auto h-fit w-fit"
+            className="-z-10"
             loading="lazy"
             onEnd={() => {
               setPlayerLoading(true);
