@@ -92,7 +92,9 @@ export default function Player(props: Props): JSX.Element {
           </div>
         </div>
       ) : (
-        <div className="mx-auto p-8 w-fit h-fit">Cap vídeo en reproducció</div>
+        <div className="mx-auto p-8 w-fit h-fit font-light text-sm">
+          Cap vídeo en reproducció
+        </div>
       )}
     </div>
   );

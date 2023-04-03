@@ -39,6 +39,9 @@ export default function VideoQueue(props: Props): JSX.Element {
       <h2 className="border-b border-gray-300 border-solid text-lg mb-4">
         Cua
       </h2>
+      {videos.length <= 0 && (
+        <p className="font-light text-sm mx-auto w-fit">Cap vídeo a la cua</p>
+      )}
       <ol>
         {videos
           .filter((v) => v)
