@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Música</title>
+        <title>{buildPageTitle(currentVideo?.snippet.title)}</title>
       </Head>
       <div className="mx-auto mt-40 xl:px-2 px-12 max-w-[1600px] flex flex-col xl:flex-row gap-10 justify-between">
         <Player
@@ -81,4 +81,13 @@ export default function Home() {
 function buildPlayerAndQueueWidth(width: number): number {
   if (width <= 1280) return width;
   return width / 2;
+}
+
+function buildPageTitle(songTitle?: string): string {
+  const pre = "Música";
+
+  if (!songTitle) return pre;
+  if (songTitle.length > 30)
+    return [pre, " · ", songTitle.slice().slice(0, 29), "… "].join(" ");
+  return [pre, songTitle].join("  ·  ");
 }

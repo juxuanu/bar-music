@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="ca">
       <Head>
         <meta name="description" content="Música per Youtube per bars" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.svg" />
       </Head>
       <body>
         <Main />

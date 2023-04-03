@@ -40,9 +40,10 @@ export default function Player(props: Props): JSX.Element {
         </div>
       )}
       {video ? (
-        <div className="h-hit w-fit">
+        <div className="h-hit w-fit mx-auto">
+          <div className="text-lg p-1">{video.snippet.title}</div>
           <YouTube
-            videoId={video ? video.id.videoId : ""}
+            videoId={video.id.videoId}
             className="-z-10 mx-auto h-fit w-fit"
             loading="lazy"
             onEnd={() => {
