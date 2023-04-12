@@ -9,11 +9,11 @@ export default function VideoCard(props: Props) {
   return (
     <div
       className={[
-        "grid grid-cols-10 space-x-0 p-2 w-full h-full justify-around",
+        "grid grid-cols-10 grid-rows-2 xl:grid-rows-1 space-x-0 p-2 w-full h-full justify-around",
         props.className,
       ].join(" ")}
     >
-      <div className="w-20 h-auto col-span-2">
+      <div className="w-20 h-fit col-span-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           style={{ width: props.video.snippet.thumbnails.default.width }}
@@ -22,7 +22,7 @@ export default function VideoCard(props: Props) {
           className="h-auto my-auto mx-auto overflow-hidden rounded"
         />
       </div>
-      <div className="flex flex-col overflow-hidden col-span-8">
+      <div className="xl:flex xl:flex-col xl:col-span-8 overflow-hidden col-span-9">
         <div
           dangerouslySetInnerHTML={{
             __html:

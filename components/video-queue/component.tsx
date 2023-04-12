@@ -21,8 +21,8 @@ export default function VideoQueue(props: Props): JSX.Element {
   useEffect(() => setVideos(props.videosInQueue), [props.videosInQueue]);
 
   return (
-    <div className="w-[35rem]">
-      <h2 className="border-b border-gray-300 border-solid text-lg mb-4">
+    <div className="xl:w-[35rem] w-full">
+      <h2 className="border-b border-gray-300 border-solid text-lg mb-4 mt-2">
         Cua
       </h2>
       {videos.length <= 0 && (

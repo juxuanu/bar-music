@@ -1,5 +1,5 @@
 import YouTube, { YouTubePlayer } from "react-youtube";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Spinner from "@/components/spinner";
 import { Video } from "@/services/google-api";
 import {
@@ -29,22 +29,28 @@ export default function Player(props: Props): JSX.Element {
     []
   );
 
+  const onVideoLoad = useCallback(() => {
+    if (youtubeElement.current && youtubeElement.current.container)
+      youtubeElement.current.container.className = "youtubeContainer";
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative xl:w-2/5">
       {playerLoading && video && (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Spinner />
         </div>
       )}
       {video ? (
-        <div className="h-hit w-full mx-auto">
+        <div className="h-fit w-full mx-auto">
           <div
             className="text-lg p-1"
             dangerouslySetInnerHTML={{ __html: video.snippet.title }}
           ></div>
           <YouTube
+            ref={youtubeElement}
             videoId={video.id.videoId}
-            className="-z-10"
+            className="-z-10 w-full h-auto mx-auto"
             loading="lazy"
             onEnd={() => {
               setPlayerLoading(true);
@@ -54,7 +60,7 @@ export default function Player(props: Props): JSX.Element {
             onReady={(event: YouTubePlayer) => {
               videoElement = event;
               setPlayerLoading(false);
-              if (youtubeElement.current) youtubeElement.current;
+              onVideoLoad();
             }}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
