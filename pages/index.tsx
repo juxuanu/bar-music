@@ -4,6 +4,7 @@ import VideoQueue from "@/components/video-queue";
 import { useCallback, useEffect, useState } from "react";
 import SearchOverlay from "@/components/search-overlay";
 import { Video } from "@/services/google-api";
+import parseString from "@/services/string-parser";
 
 const localStorageKeys = {
   videosInQueue: "videosInQueue",
@@ -104,11 +105,9 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title
-          dangerouslySetInnerHTML={{
-            __html: buildPageTitle(currentVideo?.snippet.title),
-          }}
-        ></title>
+        <title>
+          {parseString(buildPageTitle(currentVideo?.snippet.title))}
+        </title>
       </Head>
       <div className="mx-auto xl:mt-40 mt-10 xl:px-2 px-12 max-w-[1600px] flex flex-col xl:flex-row gap-10 xl:justify-between pb-4">
         <Player

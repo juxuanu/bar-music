@@ -1,4 +1,5 @@
 import { Video } from "@/services/google-api";
+import parseString from "@/services/string-parser";
 
 interface Props {
   video: Video;
@@ -23,18 +24,16 @@ export default function VideoCard(props: Props) {
         />
       </div>
       <div className="xl:flex xl:flex-col xl:col-span-8 overflow-hidden col-span-9">
-        <div
-          dangerouslySetInnerHTML={{
-            __html:
-              props.video.snippet.title.length > 100
-                ? props.video.snippet.title.slice(0, 100) + "… "
-                : props.video.snippet.title,
-          }}
-        ></div>
-        <div
-          className="font-light text-sm"
-          dangerouslySetInnerHTML={{ __html: props.video.snippet.channelTitle }}
-        ></div>
+        <div>
+          {parseString(
+            props.video.snippet.title.length > 100
+              ? props.video.snippet.title.slice(0, 100) + "… "
+              : props.video.snippet.title
+          )}
+        </div>
+        <div className="font-light text-sm">
+          {parseString(props.video.snippet.channelTitle)}
+        </div>
       </div>
     </div>
   );

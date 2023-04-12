@@ -7,6 +7,7 @@ import {
   pauseButton,
   playButton,
 } from "@/components/player/buttons";
+import parseString from "@/services/string-parser";
 
 interface Props {
   video?: Video | null;
@@ -43,10 +44,7 @@ export default function Player(props: Props): JSX.Element {
       )}
       {video ? (
         <div className="h-fit w-full mx-auto">
-          <div
-            className="text-lg p-1"
-            dangerouslySetInnerHTML={{ __html: video.snippet.title }}
-          ></div>
+          <div className="text-lg p-1">{parseString(video.snippet.title)}</div>
           <YouTube
             ref={youtubeElement}
             videoId={video.id.videoId}
